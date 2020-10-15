@@ -1,4 +1,4 @@
-module github.com/k8s-autoops/template-autoops-cronjob
+module github.com/k8s-autoops/auto-remove-evicted
 
 go 1.14
 

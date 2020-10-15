@@ -1,4 +1,4 @@
-# template-autoops-cronjob
+# auto-remove-evicted
 
 ## Usage
 
@@ -9,38 +9,38 @@ Create namespace `autoops` and apply yaml resources as described below.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: template-autoops-cronjob
+  name: auto-remove-evicted
   namespace: autoops
 ---
 # create clusterrole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: template-autoops-cronjob
+  name: auto-remove-evicted
 rules:
   - apiGroups: [""]
     resources: ["pods"]
-    verbs: ["list"]
+    verbs: ["list", "delete"]
 ---
 # create clusterrolebinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: template-autoops-cronjob
+  name: auto-remove-evicted
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: template-autoops-cronjob
+  name: auto-remove-evicted
 subjects:
   - kind: ServiceAccount
-    name: template-autoops-cronjob
+    name: auto-remove-evicted
     namespace: autoops
 ---
 # create cronjob
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: template-autoops-cronjob
+  name: auto-remove-evicted
   namespace: autoops
 spec:
   schedule: "*/5 * * * *"
@@ -48,10 +48,10 @@ spec:
     spec:
       template:
         spec:
-          serviceAccount: template-autoops-cronjob
+          serviceAccount: auto-remove-evicted
           containers:
-            - name: template-autoops-cronjob
-              image: autoops/template-autoops-cronjob
+            - name: auto-remove-evicted
+              image: autoops/auto-remove-evicted
           restartPolicy: OnFailure
 ```
 

@@ -10,6 +10,10 @@ import (
 	"os"
 )
 
+const (
+	Evicted = "Evicted"
+)
+
 func exit(err *error) {
 	if *err != nil {
 		log.Println("exited with error:", (*err).Error())
@@ -39,6 +43,17 @@ func main() {
 	if pods, err = client.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{}); err != nil {
 		return
 	}
-
-	log.Println("Total Pods:", len(pods.Items))
+	for _, pod := range pods.Items {
+		if pod.Status.Phase != corev1.PodFailed {
+			continue
+		}
+		if pod.Status.Reason != Evicted {
+			continue
+		}
+		if errLocal := client.CoreV1().Pods(pod.Namespace).Delete(context.Background(), pod.Name, metav1.DeleteOptions{}); errLocal != nil {
+			log.Printf("failed to remove %s/%s: %s", pod.Namespace, pod.Name, errLocal.Error())
+		} else {
+			log.Printf("removed %s/%s", pod.Namespace, pod.Name)
+		}
+	}
 }
